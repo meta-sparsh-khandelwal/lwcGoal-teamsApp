@@ -58,14 +58,10 @@ export default class MemberSkills extends LightningElement {
                     const event = new ShowToastEvent({
                         title: 'TeamMember Registered Successfully',
                         message:
-                            result.Id + 'Created TeamMember',
+                            'Created TeamMember: ' + result.Id,
                         variant: 'success'
                     });
-                    console.log('Result returned:::::!!!!!!!!');
-                    console.log(result);
-                    console.log(JSON.stringify(result));
                     this.insertedTeamMember = result;
-                    console.log(this.insertedTeamMember);
                     this.dispatchEvent(event);
                     this.dispatchEvent(new CustomEvent('membersubmit', {detail: JSON.stringify(this.insertedTeamMember)}));
                 })

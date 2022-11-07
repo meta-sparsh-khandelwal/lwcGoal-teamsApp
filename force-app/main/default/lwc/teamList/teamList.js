@@ -3,16 +3,14 @@ import getAllTeamMembers from '@salesforce/apex/TeamsAppService.getAllTeamMember
 import getTeamNames from '@salesforce/apex/TeamsAppService.getTeamNames';
 
 export default class TeamList extends LightningElement {
-    @track teamMembers;
+    @track teamMembers=[];
     @track teamMembersToDisplay;
     @api newMember = undefined;
+    hasTeamMembers = false;
     teamOptions;
     teamFilter=undefined;
     @api addNewTeamMember() {
-        console.log('Method called by Parent :) :) New Member:::::::');
-        console.log(this.newMember);
         this.teamMembers.push(this.newMember);
-        console.log(this.teamMembers);
         this.teamFilter = undefined;
         this.teamMembersToDisplay = this.teamMembers;
     }
@@ -30,9 +28,10 @@ export default class TeamList extends LightningElement {
     connectedCallback() {
         getAllTeamMembers()
             .then((data) => {
-                console.log(data);
                 this.teamMembers = data;
                 this.teamMembersToDisplay = this.teamMembers;
+                if(this.teamMembersToDisplay.length > 0)
+                    this.hasTeamMembers = true;
             })
             .catch(error => {
                 console.log(error);
@@ -42,11 +41,13 @@ export default class TeamList extends LightningElement {
         console.log('Changed Filter::::::::::::::::::::::::!!!!!!');
         this.teamFilter = event.detail.value;
         if(this.teamFilter) {
-            console.log(this.teamFilter);
             this.teamMembersToDisplay = this.teamMembers.filter( (element) => {
                 return element.Team__r.Name == this.teamFilter;
             });
-            console.log(this.teamMembersToDisplay);
+            if(this.teamMembersToDisplay.length > 0)
+                this.hasTeamMembers = true;
+            else
+                this.hasTeamMembers = false;
         }
     }
 }

@@ -2,8 +2,8 @@
     <lightning-card title="Team List " icon-name="custom:custom63">
         <div class="slds-m-around_medium">
             <lightning-combobox name="team" label="Team" value={teamFilter} placeholder="Select Team"
-                options={teamOptions} onchange={handleTeamFilter}></lightning-combobox>
-            <template if:true={teamMembersToDisplay}>
+                options={teamOptions} onchange={handleTeamFilter} class="filterCombobox"></lightning-combobox>
+            <template if:true={hasTeamMembers}>
                 <template for:each={teamMembersToDisplay} for:item="teamMember">
                     <div key={teamMember.Id}>
                         <lightning-card>
@@ -14,8 +14,8 @@
                     </div>
                 </template>
             </template>
-            <template if:false={teamMembersToDisplay}>
-                No Team Members currently
+            <template if:false={hasTeamMembers}>
+                <p class="noTeamMembers">No Team Members currently</p>
             </template>
         </div>
     </lightning-card>

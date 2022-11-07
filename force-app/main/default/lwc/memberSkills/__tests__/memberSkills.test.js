@@ -28,7 +28,7 @@ jest.mock(
     { virtual: true }
 );
 // Sample data for imperative Apex call
-const APEX_SAVE_TEAM_SUCCESS = [
+const APEX_SAVE_TEAM_SUCCESS =
     {
         Id: "a085i000007gy3lAAA",
         Name: "JestTestName",
@@ -37,7 +37,7 @@ const APEX_SAVE_TEAM_SUCCESS = [
         Team__r:
             { Name: "JestTestTeam", Id: "a075i000000ZxvAAAS" }
     }
-];
+;
 
 // Sample error for imperative Apex call
 const APEX_SAVE_TEAM_ERROR = {
@@ -99,7 +99,6 @@ describe('c-member-skills', () => {
         it('passes the team input to the Apex method correctly and dispatches membersubmit event', async () => {
             const USER_INPUT = { name: 'JestTestName', team: 'JestTestTeam', skills: 'Jest, LWC' };
             const APEX_PARAMETERS = { team: JSON.stringify(USER_INPUT) };
-
             // Assign mock value for resolved Apex promise
             saveTeam.mockResolvedValue(APEX_SAVE_TEAM_SUCCESS);
 
@@ -118,11 +117,11 @@ describe('c-member-skills', () => {
             const inputTeam = element.shadowRoot.querySelector('.dataCombobox');
             const inputSkills = element.shadowRoot.querySelector('.inputSkills');
             inputName.value = USER_INPUT.name;
-            inputName.dispatchEvent(new CustomEvent('change', {detail: {value: USER_INPUT.name}}));
+            inputName.dispatchEvent(new CustomEvent('change', { detail: { value: USER_INPUT.name } }));
             inputTeam.value = USER_INPUT.team;
-            inputTeam.dispatchEvent(new CustomEvent('change', {detail: {value: USER_INPUT.team}}));
+            inputTeam.dispatchEvent(new CustomEvent('change', { detail: { value: USER_INPUT.team } }));
             inputSkills.value = USER_INPUT.skills;
-            inputSkills.dispatchEvent(new CustomEvent('change', {detail: {value: USER_INPUT.skills}}));
+            inputSkills.dispatchEvent(new CustomEvent('change', { detail: { value: USER_INPUT.skills } }));
 
             // Select button for executing Apex call
             const buttonEl = element.shadowRoot.querySelector('lightning-button');
@@ -137,13 +136,13 @@ describe('c-member-skills', () => {
         it('renders the error panel when the Apex method returns an error', async () => {
             const USER_INPUT = { name: 'JestTestName', team: 'JestTestTeam', skills: 'Jest, LWC' };
             // Assing mock value for rejected Apex promise
-            saveTeam.mockRejectedValue(APEX_SAVE_TEAM_ERROR);    
+            saveTeam.mockRejectedValue(APEX_SAVE_TEAM_ERROR);
             // Create initial element
             const element = createElement('c-member-skills', {
                 is: MemberSkills
             });
             document.body.appendChild(element);
-    
+
             const memberSubmitHandler = jest.fn();
             element.addEventListener('membersubmit', memberSubmitHandler);
             getTeamNames.emit(mockGetTeamNames);
@@ -154,11 +153,48 @@ describe('c-member-skills', () => {
             const inputTeam = element.shadowRoot.querySelector('.dataCombobox');
             const inputSkills = element.shadowRoot.querySelector('.inputSkills');
             inputName.value = USER_INPUT.name;
-            inputName.dispatchEvent(new CustomEvent('change', {detail: {value: USER_INPUT.name}}));
+            inputName.dispatchEvent(new CustomEvent('change', { detail: { value: USER_INPUT.name } }));
             inputTeam.value = USER_INPUT.team;
-            inputTeam.dispatchEvent(new CustomEvent('change', {detail: {value: USER_INPUT.team}}));
+            inputTeam.dispatchEvent(new CustomEvent('change', { detail: { value: USER_INPUT.team } }));
             inputSkills.value = USER_INPUT.skills;
-            inputSkills.dispatchEvent(new CustomEvent('change', {detail: {value: USER_INPUT.skills}}));
+            inputSkills.dispatchEvent(new CustomEvent('change', { detail: { value: USER_INPUT.skills } }));
+
+            // Select button for executing Apex call
+            const buttonEl = element.shadowRoot.querySelector('lightning-button');
+            buttonEl.click();
+            await flushPromises();
+            expect(memberSubmitHandler).not.toHaveBeenCalled();
+        });
+    });
+    describe('Show Toast Event', () => {
+        it('Show success toast when team member is saved', async () => {
+            const USER_INPUT = { name: 'JestTestName', team: 'JestTestTeam', skills: 'Jest, LWC' };
+            const TOAST_TITLE = 'TeamMember Registered Successfully';
+            const TOAST_MESSAGE = 'Created TeamMember: a085i000007gy3lAAA';
+            const TOAST_VARIANT = 'success';
+            // Assign mock value for resolved Apex promise
+            saveTeam.mockResolvedValue(APEX_SAVE_TEAM_SUCCESS);
+
+            // Create initial element
+            const element = createElement('c-member-skills', {
+                is: MemberSkills
+            });
+            document.body.appendChild(element);
+            const handler = jest.fn();
+            element.addEventListener('lightning__showtoast', handler);
+            getTeamNames.emit(mockGetTeamNames);
+            await flushPromises();
+
+            // Select input fields for simulating user input
+            const inputName = element.shadowRoot.querySelector('.inputName');
+            const inputTeam = element.shadowRoot.querySelector('.dataCombobox');
+            const inputSkills = element.shadowRoot.querySelector('.inputSkills');
+            inputName.value = USER_INPUT.name;
+            inputName.dispatchEvent(new CustomEvent('change', { detail: { value: USER_INPUT.name } }));
+            inputTeam.value = USER_INPUT.team;
+            inputTeam.dispatchEvent(new CustomEvent('change', { detail: { value: USER_INPUT.team } }));
+            inputSkills.value = USER_INPUT.skills;
+            inputSkills.dispatchEvent(new CustomEvent('change', { detail: { value: USER_INPUT.skills } }));
 
             // Select button for executing Apex call
             const buttonEl = element.shadowRoot.querySelector('lightning-button');
@@ -167,7 +203,53 @@ describe('c-member-skills', () => {
             await flushPromises();
 
             // Validate parameters of mocked Apex call
-            expect(memberSubmitHandler).not.toHaveBeenCalled();
-        });    
+            // Check if toast event has been fired
+            expect(handler).toHaveBeenCalled();
+            expect(handler.mock.calls[0][0].detail.title).toBe(TOAST_TITLE);
+            expect(handler.mock.calls[0][0].detail.message).toBe(TOAST_MESSAGE);
+            expect(handler.mock.calls[0][0].detail.variant).toBe(TOAST_VARIANT);
+        });
+        it('Show error toast when save team throws error', async () => {
+            const USER_INPUT = { name: 'JestTestName', team: 'JestTestTeam', skills: 'Jest, LWC' };
+            const TOAST_TITLE = 'Error!!';
+            const TOAST_MESSAGE = APEX_SAVE_TEAM_ERROR.body.message + ' error occured';
+            const TOAST_VARIANT = 'error';
+            // Assign mock value for resolved Apex promise
+            saveTeam.mockRejectedValue(APEX_SAVE_TEAM_ERROR);
+
+            // Create initial element
+            const element = createElement('c-member-skills', {
+                is: MemberSkills
+            });
+            document.body.appendChild(element);
+            const handler = jest.fn();
+            element.addEventListener('lightning__showtoast', handler);
+            getTeamNames.emit(mockGetTeamNames);
+            await flushPromises();
+
+            // Select input fields for simulating user input
+            const inputName = element.shadowRoot.querySelector('.inputName');
+            const inputTeam = element.shadowRoot.querySelector('.dataCombobox');
+            const inputSkills = element.shadowRoot.querySelector('.inputSkills');
+            inputName.value = USER_INPUT.name;
+            inputName.dispatchEvent(new CustomEvent('change', { detail: { value: USER_INPUT.name } }));
+            inputTeam.value = USER_INPUT.team;
+            inputTeam.dispatchEvent(new CustomEvent('change', { detail: { value: USER_INPUT.team } }));
+            inputSkills.value = USER_INPUT.skills;
+            inputSkills.dispatchEvent(new CustomEvent('change', { detail: { value: USER_INPUT.skills } }));
+
+            // Select button for executing Apex call
+            const buttonEl = element.shadowRoot.querySelector('lightning-button');
+            buttonEl.click();
+
+            await flushPromises();
+
+            // Validate parameters of mocked Apex call
+            // Check if toast event has been fired
+            expect(handler).toHaveBeenCalled();
+            expect(handler.mock.calls[0][0].detail.title).toBe(TOAST_TITLE);
+            expect(handler.mock.calls[0][0].detail.message).toBe(TOAST_MESSAGE);
+            expect(handler.mock.calls[0][0].detail.variant).toBe(TOAST_VARIANT);
+        });
     });
 });
