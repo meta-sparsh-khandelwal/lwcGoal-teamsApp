@@ -12,7 +12,7 @@ export default class TeamList extends LightningElement {
     @api addNewTeamMember() {
         this.teamMembers.push(this.newMember);
         this.teamFilter = undefined;
-        this.teamMembersToDisplay = this.teamMembers;
+        this.teamMembersToDisplay = undefined;
     }
     @wire(getTeamNames)
     wiredTeamOptions({ data, error }) {
@@ -29,9 +29,7 @@ export default class TeamList extends LightningElement {
         getAllTeamMembers()
             .then((data) => {
                 this.teamMembers = data;
-                this.teamMembersToDisplay = this.teamMembers;
-                if(this.teamMembersToDisplay.length > 0)
-                    this.hasTeamMembers = true;
+                this.teamMembersToDisplay = undefined;
             })
             .catch(error => {
                 console.log(error);
