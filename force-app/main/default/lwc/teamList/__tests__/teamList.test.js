@@ -76,10 +76,8 @@ describe('c-team-list', () => {
             await flushPromises();
 
             // Select elements for validation
-            const card = element.shadowRoot.querySelectorAll('lightning-card');
-            expect(card.length).toBe(8);
-            expect(card[1].firstChild.textContent).toBe("Name: " + APEX_GET_ALL_TEAM_MEMBERS[0].Name);
-            expect(card[7].firstChild.textContent).toBe("Name: " + APEX_GET_ALL_TEAM_MEMBERS[6].Name);
+            const para = element.shadowRoot.querySelector('p');
+            expect(para.textContent).toBe("No Team Members currently");
         });
         it('renders no team members when no data is returned', async () => {
             const element = createElement('c-team-list', {

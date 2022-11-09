@@ -30,6 +30,7 @@ export default class TeamList extends LightningElement {
             .then((data) => {
                 this.teamMembers = data;
                 this.teamMembersToDisplay = undefined;
+                console.log(this.teamMembers);
             })
             .catch(error => {
                 console.log(error);
