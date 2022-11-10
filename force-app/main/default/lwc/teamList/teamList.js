@@ -6,9 +6,6 @@ export default class TeamList extends LightningElement {
     @track teamMembers=[];
     @track teamMembersToDisplay;
     @api newMember = undefined;
-    hasTeamMembers = false;
-    teamOptions;
-    teamFilter=undefined;
     @api addNewTeamMember() {
         this.teamMembers.push(this.newMember);
         this.teamFilter = undefined;
@@ -25,6 +22,9 @@ export default class TeamList extends LightningElement {
             console.log(error);
         }
     }
+    hasTeamMembers = false;
+    teamOptions;
+    teamFilter=undefined;
     connectedCallback() {
         getAllTeamMembers()
             .then((data) => {
